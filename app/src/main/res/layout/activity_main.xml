@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+<!--    android:background="#FAF1F1"-->
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <FrameLayout
+            android:id="@+id/screen_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/home"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/screen_diary"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/diary"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"    />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/screen_growth"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/growth"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"    />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/screen_write"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/write"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"    />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/screen_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/detail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"    />
+        </FrameLayout>
+
+    </FrameLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_tab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:menu="@menu/bottom_nav_menu"    />
+
+    <!--
+    <LinearLayout
+        android:id="@+id/bottom_tab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white">
+
+        <Button
+            android:id="@+id/btn_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="홈"
+            android:drawableTop="@drawable/ic_home"
+            android:gravity="center"
+            android:backgroundTint="@android:color/transparent"
+            android:textSize="10sp"     />
+
+        <Button
+            android:id="@+id/btn_diary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="일기"
+            android:drawableTop="@drawable/ic_diary"
+            android:gravity="center"
+            android:backgroundTint="@android:color/transparent"
+            android:textSize="10sp"     />
+
+        <Button
+            android:id="@+id/btn_growth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="성장"
+            android:drawableTop="@drawable/ic_growth"
+            android:gravity="center"
+            android:backgroundTint="@android:color/transparent"
+            android:textSize="10sp"     />
+
+    </LinearLayout>
+    -->
+
+</LinearLayout>
