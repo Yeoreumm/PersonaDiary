@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     Diary selectedDiary;        // 지금 보고 있는 일기 기억 변수
 
+    boolean calendarVisible = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,8 +82,14 @@ public class MainActivity extends AppCompatActivity {
         // 일기 목록
         listDiary = findViewById(R.id.list_diary);
         TextView btnAdd = findViewById(R.id.btn_add);
+
         // + 버튼 : 일기 쓰기 화면 전환
         btnAdd.setOnClickListener(v -> showScreen(3));
+
+        android.widget.ImageView btnCalendar = findViewById(R.id.btn_calendar);
+        if (btnCalendar != null) {
+            btnCalendar.setOnClickListener(v -> setupCalendar());
+        }
 
         // 앱 시작 시 기존 일기 불러오기
         List<Diary> diaryList = db.diaryDao().getAll();
@@ -277,5 +285,26 @@ public class MainActivity extends AppCompatActivity {
                 chip.setTextColor(0xFF444441);
                 break;
         }
+    }
+
+    void setupCalendar() {
+        android.app.DatePickerDialog dialog = new android.app.DatePickerDialog(this);
+        dialog.setOnDateSetListener((view, year, month, dayOfMonth) -> {
+            String selected = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            listDiary.removeAllViews();
+            List<Diary> all = db.diaryDao().getAll();
+            boolean found = false;
+            for (Diary d : all) {
+                if (d.date.startsWith(selected)) {
+                    addDiaryCard(d);
+                    found = true;
+                }
+            }
+            if (!found) {
+                Toast.makeText(this, selected + "에 작성한 일기가 없어요", Toast.LENGTH_SHORT).show();
+            }
+            calendarVisible = false;
+        });
+        dialog.show();
     }
 }

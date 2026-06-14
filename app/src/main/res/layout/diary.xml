@@ -19,13 +19,21 @@
             android:textSize="18sp"
             android:textStyle="bold"    />
 
+        <ImageView
+            android:id="@+id/btn_calendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:src="@drawable/ic_calendar"
+            android:contentDescription="달력"     />
+
         <TextView
             android:id="@+id/btn_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="+"
             android:textSize="24sp"
-            android:padding="8dp"       />
+            android:padding="8dp"   />
 
     </LinearLayout>
 
