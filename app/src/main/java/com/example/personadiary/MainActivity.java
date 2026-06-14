@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -102,12 +103,24 @@ public class MainActivity extends AppCompatActivity {
             String title = editTitle.getText().toString();
             String emotion = editEmotion.getText().toString();
             String content = editDiary.getText().toString();
+
+            // 빈 칸 저장 방지
+            if (title.isEmpty() || emotion.isEmpty() || content.isEmpty()) {
+                Toast.makeText(this, "빈칸을 모두 입력해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             String date = new SimpleDateFormat(
                     "yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
             Diary diary = new Diary( title, emotion, content, date);
             db.diaryDao().insert(diary);
-            addDiaryCard(diary);        // 카드로 추가
+            // addDiaryCard(diary);        // 카드로 추가
+            listDiary.removeAllViews();
+            List<Diary> refreshed = db.diaryDao().getAll();
+            for (Diary d : refreshed) {
+                addDiaryCard(d);
+            }
 
             editTitle.setText("");
             editEmotion.setText("");
@@ -193,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         TextView growthLevel = findViewById(R.id.growth_level);
         TextView growthCount = findViewById(R.id.growth_count);
         growthLevel.setText("Lv. " + level);
-        growthCount.setText("일기 " + total + "편 누적");
+        growthCount.setText("일기 " + total + "편 작성");
 
         // 감정별 카운트
         java.util.Map<String, Integer> emotionMap = new java.util.LinkedHashMap<>();

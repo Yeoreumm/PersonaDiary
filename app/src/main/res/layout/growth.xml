@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="일기 0편 누적"
+            android:text="일기 0편 작성"
             android:textSize="12sp"    />
 
         <!-- 구분선 -->

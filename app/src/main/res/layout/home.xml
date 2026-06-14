@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="9dp"
-        android:text="다정한 나"
+        android:text="다정한 나(AI분석)"
         android:textSize="14sp"     />
 
     <!-- 일기 쓰기 버튼 -->
