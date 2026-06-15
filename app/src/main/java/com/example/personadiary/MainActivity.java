@@ -14,6 +14,7 @@ import androidx.room.Room;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -75,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 "yyyy년 MM월 dd일 EEEE", Locale.KOREAN).format(new Date());
         homeDate.setText(today);
 
+        //===================================================
+        // 홈 화면 , 말풍선 AI 연결
+        updateHomeBubble();
+
         // 홈 화면 "오늘 일기 쓰기 버튼"
         Button btnGoWrite = findViewById(R.id.btn_go_write);
         btnGoWrite.setOnClickListener(v -> showScreen(3));
@@ -133,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
             editTitle.setText("");
             editEmotion.setText("");
             editDiary.setText("");
+            updateHomeBubble();
             showScreen(1);
         });
 
@@ -216,6 +222,66 @@ public class MainActivity extends AppCompatActivity {
         growthLevel.setText("Lv. " + level);
         growthCount.setText("일기 " + total + "편 작성");
 
+        // =====================
+        // 연속 작성일 계산
+        TextView growthStreak = findViewById(R.id.growth_streak);
+        java.util.Set<String> dateset = new java.util.HashSet<>();
+        for (Diary d : all) {
+            dateset.add(d.date.substring(0, 10));   // yyyy-MM-dd만 추출
+        }
+
+        int streak = 0;
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
+
+        while(true) {
+            String dateStr = sdf.format(cal.getTime());
+            if (dateset.contains(dateStr)) {
+                streak++;
+                cal.add(Calendar.DAY_OF_MONTH, -1); // 하루씩 거슬러 올라가기
+            } else {
+                break;
+            }
+        }
+
+        growthStreak.setText("🔥 " + streak + "일 연속 작성 중!");
+
+        // =====================
+        // 이번 달 요약 AI
+        TextView growthSummary = findViewById(R.id.growth_summary);
+        growthSummary.setText("분석 중...");
+
+        // 이번 달 일기만 필터링
+        String thisMonth = new SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(new Date());
+        StringBuilder monthDiaries = new StringBuilder();
+        for (Diary d : all) {
+            if (d.date.startsWith(thisMonth)) {
+                monthDiaries.append(d.date.substring(0, 10))
+                        .append(": ")
+                        .append(d.content)
+                        .append("\n");
+            }
+        }
+
+        if (monthDiaries.length() == 0) {
+            growthSummary.setText("아직 이번 달 일기가 없어요.");
+        } else {
+            String summaryPrompt = "아래는 사용자가 이번 달에 쓴 일기야:\n" + monthDiaries + "\n이번 달 이 사람에게 어떤 일들이 있었는지, " + "감정 흐름은 어땠는지 따뜻하게 2~3문장으로 요약해줘. 반말로.";
+
+            GeminiClient.ask(summaryPrompt, new GeminiClient.GeminiCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    growthSummary.setText(result);
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    growthSummary.setText("요약을 불러오지 못했어요.");
+                }
+            });
+        }
+
+        // =====================
         // 감정별 카운트
         java.util.Map<String, Integer> emotionMap = new java.util.LinkedHashMap<>();
         for (Diary d : all) {
@@ -306,5 +372,48 @@ public class MainActivity extends AppCompatActivity {
             calendarVisible = false;
         });
         dialog.show();
+    }
+
+    // 말풍선 자동 갱신
+    void updateHomeBubble() {
+        TextView homeBubble = findViewById(R.id.home_bubble);
+        if (homeBubble == null) return;
+
+        homeBubble.setText("잠깐만...");
+
+        List<Diary> recent = db.diaryDao().getAll();
+        int total = recent.size();
+        int level = (total / 5) + 1;
+
+        StringBuilder diaryText = new StringBuilder();
+        int count = 0;
+        for (Diary d : recent) {
+            if (count >= 5) break;
+            diaryText.append("일기 내용 : ").append(d.content).append("\n");
+            count++;
+        }
+
+        String prompt;
+        if (diaryText.length() == 0) {
+            // 일기 없으면 기본 멘트
+            prompt = "처음 만난 사용자에게 일기 앱 캐릭터로서 친근하게 오늘 안부를 묻는 짧은 한 마디를 한국어로 만들어줘. 반말로.";
+        } else {
+            prompt = "아래는 사용자가 쓴 일기야:\n" + diaryText +
+                    "\n이 사람의 말투와 감정을 분석해서, 이 사람처럼 말하는 친근한 캐릭터가 " +
+                    "오늘 안부를 묻는 짧은 한 마디를 한국어로 만들어줘. " +
+                    "사용자의 말투를 흉내내서 반말로. 30자 이내로.";
+        }
+
+        GeminiClient.ask(prompt, new GeminiClient.GeminiCallback() {
+            @Override
+            public void onSuccess(String result) {
+                homeBubble.setText(result);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                homeBubble.setText("오늘 하루 어땠어? 나한테 말해줘 ㅎㅎ");
+            }
+        });
     }
 }
